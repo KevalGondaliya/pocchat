@@ -9,10 +9,12 @@ import {
   Image,
   AsyncStorage,
   BackHandler,
+  FlatList,
   RefreshControl,
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import IconEntypo from 'react-native-vector-icons/Entypo';
@@ -26,6 +28,7 @@ import Searchbar from '../components/Searchbar/Searchbar';
 import * as queries from '../graphql/queries';
 import _ from 'lodash';
 import * as subscriptions from '../graphql/subscriptions';
+import BulkEventsScreen from '../screens/BulkEventsScreen';
 import moment from 'moment';
 const nextEvent = [
   {
@@ -81,6 +84,16 @@ const extraEvents = [
     location: 'Kodak Theatre',
   },
 ];
+
+const eventType = [
+  {type: 1, name: 'Hosted Events'},
+  {type: 2, name: 'Guest Events'},
+  {type: 3, name: 'Private Events'},
+  {type: 4, name: 'Work'},
+  {type: 5, name: 'Social'},
+  {type: 6, name: 'Family'},
+];
+
 class HomeScreen extends React.Component {
   async componentWillUnmount() {
     if (this.subscriptionsNewMessage) {
@@ -115,9 +128,19 @@ class HomeScreen extends React.Component {
       value: '',
       refreshing: false,
       Convonestion: [],
+      isModalVisible: false,
+      visibleEvent: false,
     };
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
+
+  toggleModal = () => {
+    this.setState({isModalVisible: !this.state.isModalVisible});
+  };
+
+  upComingEventtoggleModal = () => {
+    this.setState({visibleEvent: !this.state.visibleEvent});
+  };
 
   handleBackButtonClick() {
     console.log('Props  Navigation', this.props.navigation);
@@ -335,7 +358,27 @@ class HomeScreen extends React.Component {
           </View>
           <View
             style={{marginHorizontal: 40, position: 'relative', bottom: 50}}>
-            <TouchableOpacity>
+            <Modal
+              isVisible={this.state.visibleEvent}
+              onBackdropPress={() =>
+                this.setState({visibleEvent: !this.state.visibleEvent})
+              }>
+              <View style={{borderRadius: 20}}>
+                <FlatList
+                  data={eventType}
+                  renderItem={({item}) => (
+                    <View
+                      style={{
+                        backgroundColor: '#FFF',
+                        padding: 20,
+                      }}>
+                      <Text>{item.name}</Text>
+                    </View>
+                  )}
+                />
+              </View>
+            </Modal>
+            <TouchableOpacity onPress={this.upComingEventtoggleModal}>
               <View style={styles.upcomingEventButton}>
                 <Text style={{color: '#404040'}}>Upcoming Events</Text>
                 <Ionicons
@@ -348,32 +391,164 @@ class HomeScreen extends React.Component {
             </TouchableOpacity>
           </View>
           <View>
-            <View style={[styles.upcommingEventStyle, {marginBottom: 40}]}>
-              <Image style={styles.cardImage} source={upComingEvent[0].image} />
-              <View style={styles.eventDetail}>
-                <Text style={styles.eventTitle}>{upComingEvent[0].title}</Text>
-                <View style={{flexDirection: 'row'}}>
-                  <Icon
-                    name="calendar"
-                    color="#F6502B"
-                    size={20}
-                    style={{position: 'absolute', top: 5}}
-                  />
-                  <Text style={styles.eventDate}>{upComingEvent[0].date}</Text>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                  <Icon
-                    name="location"
-                    color="#F6502B"
-                    size={20}
-                    style={{position: 'absolute', top: 5}}
-                  />
-                  <Text style={styles.eventLocation}>
-                    {upComingEvent[0].location}
+            <Modal
+              isVisible={this.state.isModalVisible}
+              onBackdropPress={() =>
+                this.setState({isModalVisible: !this.state.isModalVisible})
+              }>
+              <View style={styles.detailViewEvent}>
+                <Image
+                  style={{alignSelf: 'center', width: 393, height: 200}}
+                  source={require('../../assets/image/9.png')}
+                />
+                <View style={{margin: 20}}>
+                  <Text style={{fontSize: 22, fontFamily: 'Roboto'}}>
+                    Olivia's Spectacular 28th Birthday Party
                   </Text>
+                  <View
+                    style={{
+                      marginVertical: 10,
+                    }}>
+                    <View style={{flexDirection: 'row'}}>
+                      <Icon
+                        name="calendar"
+                        color="#F6502B"
+                        size={17}
+                        style={{position: 'absolute', top: 5}}
+                      />
+                      <Text style={styles.eventDate}>Tuseday, Aug 2, 2019</Text>
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                      <Icon
+                        name="clock"
+                        color="#F6502B"
+                        size={17}
+                        style={{position: 'absolute', top: 5}}
+                      />
+                      <Text style={styles.eventDate}>7:00pm - 10:00pm</Text>
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                      <Icon
+                        name="location"
+                        color="#F6502B"
+                        size={17}
+                        style={{position: 'absolute', top: 5}}
+                      />
+                      <Text style={styles.eventDate}>Olivia's House</Text>
+                    </View>
+                    <View
+                      style={{
+                        marginTop: 20,
+                        borderWidth: 1,
+                        backgroundColor: 'red',
+                        borderColor: AppStyles.color.background,
+                      }}
+                    />
+                  </View>
+                  <View>
+                    <Text style={{fontFamily: 'Avenir', fontSize: 18}}>
+                      Address
+                    </Text>
+                    <View style={{marginVertical: 10}}>
+                      <Text>11647 San Vicente Bvld</Text>
+                      <Text>Los Angeles, CA 90049</Text>
+                    </View>
+                    <View
+                      style={{
+                        marginTop: 20,
+                        borderWidth: 1,
+                        backgroundColor: 'red',
+                        borderColor: AppStyles.color.background,
+                      }}
+                    />
+                  </View>
+                  <View>
+                    <Text
+                      style={{
+                        fontFamily: 'Avenir',
+                        fontSize: 18,
+                        marginTop: 10,
+                      }}>
+                      Message
+                    </Text>
+                    <Text>
+                      we'er celebrating Olivia'a arrival on earth 28 years ago!
+                      can't wait to see everyone!
+                    </Text>
+                    <View
+                      style={{
+                        marginTop: 20,
+                        borderWidth: 1,
+                        backgroundColor: 'red',
+                        borderColor: AppStyles.color.background,
+                      }}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Avenir',
+                        fontSize: 16,
+                        marginTop: 10,
+                      }}>
+                      Invited By Olivia Burgess
+                    </Text>
+                    <View
+                      style={{
+                        marginTop: 10,
+                        backgroundColor: '#6600cc',
+                        width: 70,
+                        borderRadius: 20,
+                      }}>
+                      <TouchableOpacity>
+                        <Text style={{alignSelf: 'center', color: '#fff'}}>
+                          social
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
               </View>
-            </View>
+            </Modal>
+            <TouchableOpacity onPress={this.toggleModal}>
+              <View style={[styles.upcommingEventStyle, {marginBottom: 40}]}>
+                <Image
+                  style={styles.cardImage}
+                  source={upComingEvent[0].image}
+                />
+                <View style={styles.eventDetail}>
+                  <Text style={styles.eventTitle}>
+                    {upComingEvent[0].title}
+                  </Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <Icon
+                      name="calendar"
+                      color="#F6502B"
+                      size={20}
+                      style={{position: 'absolute', top: 5}}
+                    />
+                    <Text style={styles.eventDate}>
+                      {upComingEvent[0].date}
+                    </Text>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <Icon
+                      name="location"
+                      color="#F6502B"
+                      size={20}
+                      style={{position: 'absolute', top: 5}}
+                    />
+                    <Text style={styles.eventLocation}>
+                      {upComingEvent[0].location}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
             <View
               style={{
                 width: deviceWidth / 1.2,
@@ -384,32 +559,41 @@ class HomeScreen extends React.Component {
                 borderBottomColor: '#E8E8E8',
               }}
             />
-            <View style={[styles.upcommingEventStyle]}>
-              <Image style={styles.cardImage} source={upComingEvent[1].image} />
-              <View style={styles.eventDetail}>
-                <Text style={styles.eventTitle}>{upComingEvent[1].title}</Text>
-                <View style={{flexDirection: 'row'}}>
-                  <Icon
-                    name="calendar"
-                    color="#F6502B"
-                    size={20}
-                    style={{position: 'absolute', top: 5}}
-                  />
-                  <Text style={styles.eventDate}>{upComingEvent[1].date}</Text>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                  <Icon
-                    name="location"
-                    color="#F6502B"
-                    size={20}
-                    style={{position: 'absolute', top: 5}}
-                  />
-                  <Text style={styles.eventLocation}>
-                    {upComingEvent[1].location}
+            <TouchableOpacity>
+              <View style={[styles.upcommingEventStyle]}>
+                <Image
+                  style={styles.cardImage}
+                  source={upComingEvent[1].image}
+                />
+                <View style={styles.eventDetail}>
+                  <Text style={styles.eventTitle}>
+                    {upComingEvent[1].title}
                   </Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <Icon
+                      name="calendar"
+                      color="#F6502B"
+                      size={20}
+                      style={{position: 'absolute', top: 5}}
+                    />
+                    <Text style={styles.eventDate}>
+                      {upComingEvent[1].date}
+                    </Text>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <Icon
+                      name="location"
+                      color="#F6502B"
+                      size={20}
+                      style={{position: 'absolute', top: 5}}
+                    />
+                    <Text style={styles.eventLocation}>
+                      {upComingEvent[1].location}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
           <View
             style={{
@@ -506,7 +690,8 @@ class HomeScreen extends React.Component {
                   position: 'absolute',
                   alignSelf: 'center',
                 }}>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={this.props.navigation.navigate('BulkEventsScreen')}>
                   <Text style={{color: '#FFF', textAlign: 'center'}}>
                     View All
                   </Text>
@@ -588,17 +773,20 @@ class HomeScreen extends React.Component {
               </View>
               <View
                 style={{
-                  width: 200,
+                  width: deviceWidth / 3.7,
+                  marginTop: 135,
                   flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  paddingHorizontal: 10,
+                  position: 'absolute',
+                  alignSelf: 'center',
                 }}>
                 <View
                   style={{
-                    backgroundColor: '#F6502B',
+                    backgroundColor: '#39d567',
                     borderRadius: 25,
-                    padding: 10,
+                    padding: 15,
                     bottom: 155,
-                    alignSelf: 'center',
+                    marginRight: 10,
                   }}>
                   <TouchableOpacity>
                     <Ionicons
@@ -611,9 +799,8 @@ class HomeScreen extends React.Component {
                   style={{
                     backgroundColor: '#F6502B',
                     borderRadius: 25,
-                    padding: 10,
+                    padding: 15,
                     bottom: 155,
-                    alignSelf: 'center',
                   }}>
                   <TouchableOpacity>
                     <IconEntypo name="cross" color={AppStyles.color.white} />
@@ -641,6 +828,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: AppStyles.color.title,
     fontSize: 25,
+  },
+  detailViewEvent: {
+    width: deviceWidth / 1.1,
+    backgroundColor: AppStyles.color.white,
   },
   upcomingEventButton: {
     width: deviceWidth / 3,
