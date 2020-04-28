@@ -1,0 +1,50 @@
+type User @model {
+  id: ID!
+  username: String!
+  userConversations: [ConvoLink] @connection(name: "UserLinks")
+}
+
+type Message @model {
+  id: ID!
+  content: String
+  createdAt: String!
+  chatbot: Boolean
+  isSent: Boolean
+  isChild: Boolean
+  files: [S3Object]
+  messageUserId: ID!
+  messageUserName: String
+  messageConversationId: ID!
+  user: User @connection
+  conversation: Conversation @connection(name: "ConvoMsgs")
+}
+
+type Conversation @model {
+  id: ID!
+  name: String!
+  isPrivate: Boolean
+  type: String!
+  createdAt: String
+  messages: [Message] @connection(name: "ConvoMsgs", sortField: "createdAt")
+  associated: [ConvoLink] @connection(name: "associatedLinks")
+  editors: [String]
+}
+
+type ConvoLink @model {
+  id: ID!
+  isPrivate: String!
+  name: String
+  status: String
+  convoLinkConversationId: ID!
+  and: [ConvoLink]
+  or: [ConvoLink]
+  convoLinkUserId: ID!
+  user: User @connection(name: "UserLinks")
+  conversation: Conversation @connection(name: "associatedLinks")
+}
+
+type S3Object {
+  bucket: String
+  region: String
+  key: String!
+}

@@ -1,0 +1,20 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-pocchat-dev-192701-authRole",
+            "UnauthRoleArn": "arn:aws:iam::889431965154:role/amplify-pocchat-dev-192701-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::889431965154:role/amplify-pocchat-dev-192701-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "amplify-pocchat-dev-192701-deployment",
+            "UnauthRoleName": "amplify-pocchat-dev-192701-unauthRole",
+            "StackName": "amplify-pocchat-dev-192701",
+            "StackId": "arn:aws:cloudformation:us-east-1:889431965154:stack/amplify-pocchat-dev-192701/ff4973a0-7a69-11ea-b7eb-0e1cfc6fd327",
+            "AmplifyAppId": "d17n1s6d63m6qq"
+        },
+        "categories": {
+            "auth": {
+                "pocchat924ba67e": {}
+            }
+        }
+    }
+}
